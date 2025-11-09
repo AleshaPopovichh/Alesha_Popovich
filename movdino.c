@@ -333,7 +333,7 @@ void jump_dino(struct Field *f, char *dir, int jum) {
 }
 
 
-/// ДЕРЕВО, БЛИН, НЕ ПРОЙДЁШЬ
+/// ДЕРЕВО
 void grow_dino(struct Field *f, char *dir) {
     if (!f->has_dino) return;
 
@@ -377,7 +377,7 @@ void cut_dino(struct Field *f, char *dir) {
     if (ty < 0) ty = f->h - 1;
     if (ty >= f->h) ty = 0;
 
-    if (f->tiles[ty][tx] == '&') f->tiles[ty][tx] = '_'; // срубили, клетка пустая
+    if (f->tiles[ty][tx] == '&') f->tiles[ty][tx] = '_'; //срубили
 }
 
 /// КАМЕНЬ
@@ -397,7 +397,7 @@ void make_dino(struct Field *f, char *dir) {
     if (ty < 0) ty = f->h - 1;
     if (ty >= f->h) ty = 0;
 
-    if (f->tiles[ty][tx] == '_') f->tiles[ty][tx] = '@'; // вылупился камень и свалился с луны лунтику на голову
+    if (f->tiles[ty][tx] == '_') f->tiles[ty][tx] = '@'; //вылупился камень и свалился с луны лунтику на голову
 }
 
 /// ПИНАЕМ КАМЕНЬ, ДИНО МАГЕЕЕЕЕЕТ
@@ -421,7 +421,7 @@ void push_dino(struct Field *f, char *dir) {
 
     if (f->tiles[by][bx] != '@') return; // рядом камня нет
 
-    // куда двигаем камень? противоположно динозавру
+    //двигаем камень противоположно динозавру
     int nx = bx, ny = by;
     if (strcmp(dir, "UP") == 0) ny--;
     else if (strcmp(dir, "DOWN") == 0) ny++;
@@ -433,7 +433,7 @@ void push_dino(struct Field *f, char *dir) {
     if (ny < 0) ny = f->h - 1;
     if (ny >= f->h) ny = 0;
 
-    // камень не может в гору или дерево
+    // камень не может в гору или в деревоа
     if (f->tiles[ny][nx] == '^' || f->tiles[ny][nx] == '&' || f->tiles[ny][nx] == '@') return;
 
     // если попал в яму
@@ -454,7 +454,7 @@ void Comands_din(char *line, struct Field *f) {
     int w, h;
 
     sscanf(line + p, "%d %d", &w, &h);
-    
+
     if (w < 10) w = 10;
     if (w > 100) w = 100;
     if (h < 10) h = 10;
@@ -516,7 +516,6 @@ void Comands_din(char *line, struct Field *f) {
     }
 }
 
-// ================== MAIN ==================
 
 int main(int argn, char *args[]) {
 
