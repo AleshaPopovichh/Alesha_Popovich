@@ -147,27 +147,39 @@ void jump_dino(struct Field *f, char *dir, int jum) {
     
     if (strcmp(dir, "UP") == 0){ //движение дино вверх
         for (int i = 0; i < jum; i++){ //дино двигается до размера прыжка или до препятствия
+
             
-            if (f->dino_y-2 >= 0 && i == (jum-2) && f->tiles[f->dino_y-2][tx] == '%'){ //низя в яму
+            if (jum == 1 && f->tiles[f->dino_y-1][tx] == '%' && f->dino_y-1 >= 0) { //если яма стоит перед дино и у нас только 1 ход, низя
                 f->dino_y = ty;
                 exit(0);
             }
-            if (ty-i-1 >= 0){ //дино идет вверх до первой строчки включительно
-                f->dino_y = ty-i-1;
-            }
-            
-            if (ty-i-1 >= 0 && f->tiles[ty-i-1][tx] == '^'){ //если по пути нашлась гора, он встает перед дней
-                f->dino_y = (ty-i-1)+1;
-                break;
-            }
-            if (f->tiles[(f->h-1)][tx] == '^' && f->dino_y-1 < 0){ //если гора в конце
-                break;
-            }
-            if (f->dino_y-1 < 0 && i == (jum-2) && f->tiles[(f->h-1)][tx] == '%'){ //если яма в конце
+            if (f->dino_y-1 >= 0 && ((jum >= 2) && (i == jum-1)) && f->tiles[f->dino_y-1][tx] == '%'){ //низя в яму
                 f->dino_y = ty;
                 exit(0);
             }
 
+            if (f->dino_y - i - 1 < 0 && ((f->dino_y == 0) && (i == jum-1)) && f->tiles[f->h-1][tx] == '%'){ //если яма в конце
+                f->dino_y = ty;
+                exit(0);
+            }
+
+
+            
+            if (((f->dino_y + 1) < (f->h-1)) && (f->tiles[f->dino_y + 1][tx] == '^' || f->tiles[f->dino_y + 1][tx] == '&' || f->tiles[f->dino_y + 1][tx] == '@')){ //если по пути нашлась гора, камень или дерево, он встает перед дней
+                if (f->tiles[f->dino_y][tx] == '%'){
+                    f->dino_y = ty;
+                } else {
+                    f->dino_y = f->dino_y;
+                    break;
+                }
+            }  
+            if ((f->tiles[(f->h-1)][tx] == '^' || f->tiles[(f->h-1)][tx] == '&' || f->tiles[(f->h-1)][tx] == '@')&& f->dino_y-1 < 0){ //если гора в конце
+                break;
+            }
+
+            if (ty-i-1 >= 0){ //дино идет вверх до первой строчки включительно
+                f->dino_y = ty-i-1;
+            }
 
             if (ty-i-1 < 0){ //если дино выходит с противоположной стороны (то есть он идет с последней строки вверх) и по пути нету гор
                 if ((((f->h)-1)-count) >= 0){
@@ -188,29 +200,33 @@ void jump_dino(struct Field *f, char *dir, int jum) {
     }
     if (strcmp(dir, "DOWN") == 0){ //движение дино вниз
         for (int i = 0; i < jum; i++){ //дино двигается до размера прыжка или до препятствия
-            
-            if (f->dino_y+2 < f->h && (i == (jum-2) || i == 0 || i == 1) && f->tiles[f->dino_y+2][tx] == '%'){ //низя в яму
+            if (jum == 1 && f->tiles[f->dino_y+1][tx] == '%' && f->dino_y+1 <= f->h-1) { //если яма стоит перед дино и у нас только 1 ход, низя
+                f->dino_y = ty;
+                exit(0);
+            }
+            if (f->dino_y+1 <= f->h-1 && ((jum >= 2) && (i == jum-1)) && f->tiles[f->dino_y+1][tx] == '%'){ //низя в яму
                 f->dino_y = ty;
                 exit(0);
             }
 
-            
+            if (f->dino_y + i + 1 > f->h-1 && ((f->dino_y == f->h-1) && (i == jum-1)) && f->tiles[0][tx] == '%'){ //если яма в конце
+                f->dino_y = ty;
+                exit(0);
+            }
             
             if (ty+i+1 < f->h){ //дино идет вниз до последней строчки включительно
                 f->dino_y = ty+i+1;
             }
             
-            if (ty+i+1 < f->h && f->tiles[ty+i+1][tx] == '^'){ //если по пути нашлась гора, он встает перед дней
-                f->dino_y = (ty+i+1)-1;
+            if (((f->dino_y + 1) < (f->h-1)) && (f->tiles[f->dino_y + 1][tx] == '^' || f->tiles[f->dino_y + 1][tx] == '&' || f->tiles[f->dino_y + 1][tx] == '@')){ //если по пути нашлась гора, камень или дерево, он встает перед дней
+                f->dino_y = f->dino_y;
                 break;
             }
-            if (f->tiles[0][tx] == '^' && f->dino_y+1 > f->h-1){ //если гора в начале
+            
+            if ((f->tiles[0][tx] == '^' || f->tiles[0][tx] == '&' || f->tiles[0][tx] == '@')&& f->dino_y+1 >= f->h-1){ //если гора в начале
                 break;
             }
-            if (f->dino_y+1 > f->h-1 && i == (jum-2) && f->tiles[0][tx] == '%'){ //если яма в начле
-                f->dino_y = ty;
-                exit(0);
-            }
+
 
 
             if (ty+i+1 > f->h-1){ //если дино выходит с противоположной стороны (то есть он идет с первой строки вниз)
@@ -234,11 +250,21 @@ void jump_dino(struct Field *f, char *dir, int jum) {
         for (int i = 0; i < jum; i++){ // двигаемся до размера прыжка или до горы
 
             // низя в яму
-            if (f->dino_x-2 >= 0 && (i == (jum-2) || i == 0 || i == 1) && f->tiles[ty][f->dino_x-2] == '%'){
+            
+
+            if (jum == 1 && f->tiles[ty][f->dino_x-1] == '%' && f->dino_x-1 >= 0) { //если яма стоит перед дино и у нас только 1 ход, низя
+                f->dino_x = tx;
+                exit(0);
+            }
+            if (f->dino_x-1 >= 0 && ((jum >= 2) && (i == jum-1)) && f->tiles[ty][f->dino_x-1] == '%'){ //низя в яму
                 f->dino_x = tx;
                 exit(0);
             }
 
+            if (f->dino_x - i - 1 <= 0 && ((f->dino_x == 0) && (i == jum-1)) && f->tiles[ty][f->w-1] == '%'){ //если яма в конце
+                f->dino_y = ty;
+                exit(0);
+            }
 
             // идем влево
             if (tx-i-1 >= 0){
@@ -246,21 +272,18 @@ void jump_dino(struct Field *f, char *dir, int jum) {
             }
 
             // если по пути гора встать перед ней
-            if (tx-i-1 >= 0 && f->tiles[ty][tx-i-1] == '^'){
-                f->dino_x = (tx-i-1)+1;
+            if (f->dino_x-1 >=0 && (f->tiles[ty][f->dino_x-1] == '^' || f->tiles[ty][f->dino_x-1] == '&' || f->tiles[ty][f->dino_x-1] == '@')){
+                f->dino_x = f->dino_x;
                 break;
             }
 
-            // гора на левой границе
-            if (f->tiles[ty][0] == '^' && f->dino_x-1 < 0){
+            // гора на правой границе
+            if ((f->tiles[ty][f->w-1] == '^' || f->tiles[ty][f->w-1] == '&' || f->tiles[ty][f->w-1] == '@') && f->dino_x-1 < 0){
+                f->dino_x = 0;
                 break;
             }
 
-            // яма на левой границе
-            if (f->dino_x-1 < 0 && i == (jum-2) && f->tiles[ty][(f->w)-1] == '%'){
-            f->dino_x = tx;
-            exit(0);
-            }
+    
 
             // переход через границу
             if (tx-i-1 < 0){
@@ -284,8 +307,17 @@ void jump_dino(struct Field *f, char *dir, int jum) {
         for (int i = 0; i < jum; i++){
 
             // нельзя в яму
-            if (f->dino_x+2 < f->w && (i == (jum-2) || i == 0 || i == 1) && f->tiles[ty][f->dino_x+2] == '%'){
+            if (jum == 1 && f->tiles[ty][f->dino_x+1] == '%' && f->dino_x+1 <= f->w-1) { //если яма стоит перед дино и у нас только 1 ход, низя
                 f->dino_x = tx;
+                exit(0);
+            }
+            if (f->dino_x+1 <= f->w-1 && ((jum >= 2) && (i == jum-1)) && f->tiles[ty][f->dino_x+1] == '%'){ //низя в яму
+                f->dino_x = tx;
+                exit(0);
+            }
+
+            if (f->dino_x + i + 1 >= f->w-1 && ((f->dino_x == f->w-1) && (i == jum-1)) && f->tiles[ty][0] == '%'){ //если яма в конце
+                f->dino_y = ty;
                 exit(0);
             }
 
@@ -295,22 +327,20 @@ void jump_dino(struct Field *f, char *dir, int jum) {
                 f->dino_x = tx+i+1;
             }
 
-            // гора на пути
-            if (tx+i+1 < f->w && f->tiles[ty][tx+i+1] == '^'){
-                f->dino_x = (tx+i+1)-1;
+            // если по пути гора встать перед ней
+            if (f->dino_x+1 <= f->w-1 && (f->tiles[ty][f->dino_x+1] == '^' || f->tiles[ty][f->dino_x+1] == '&' || f->tiles[ty][f->dino_x+1] == '@')){
+                f->dino_x = f->dino_x;
+                printf("Нельзя перепрыгивать через препятствия!\n");
                 break;
             }
 
-            // гора справа у края
-            if (f->tiles[ty][(f->w)-1] == '^' && f->dino_x+1 > (f->w)-1){
+            // гора на левой границе
+            if ((f->tiles[ty][0] == '^' || f->tiles[ty][0] == '&' || f->tiles[ty][0] == '@') && f->dino_x+1 > f->w-1){
+                f->dino_x = f->w-1;
                 break;
             }
 
-            // яма у края
-            if (f->dino_x+1 > (f->w)-1 && i == (jum-2) && f->tiles[ty][0] == '%'){
-                f->dino_x = tx;
-                exit(0);
-                }
+           
 
             // переход через границу
             if (tx+i+1 > (f->w)-1){
@@ -456,7 +486,7 @@ void Comands_din(char *line, struct Field *f) {
     sscanf(line + p, "%d %d", &w, &h);
 
     if (w < 10) w = 10;
-    if (w > 100) w = 100;
+    if (w > 100) w = 100;  ///ограничение на размеры
     if (h < 10) h = 10;
     if (h > 100) h = 100;
 
@@ -519,16 +549,8 @@ void Comands_din(char *line, struct Field *f) {
 
 int main(int argn, char *args[]) {
 
-    if (argn < 2) {
-        printf("Wrong arguments!\n");
-        return 0;
-    }
 
     FILE *file = fopen(args[1], "r");
-    if (!file) {
-        printf("Unable to open file %s\n", args[1]);
-        return 0;
-    }
 
     struct Field field = {0};
     char line[256];
